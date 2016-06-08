@@ -22,17 +22,6 @@ class App extends Component {
     this.handleNoteSubmit = this.handleNoteSubmit.bind(this);
   }
 
-  newFolderId() {
-    let folderIds = [0];
-    let { folderList } = this.state;
-
-    if (folderList.length) {
-      folderIds = folderList.map((folder) => { return folder.id; });
-    }
-
-    return Math.max(...folderIds) + 1;
-  }
-
   handleFolderSubmit(event) {
     event.preventDefault();
     let newFolder = {
@@ -51,10 +40,6 @@ class App extends Component {
   }
 
   handleFolderClick(id) {
-    let newFolder = this.state.folderList.find((folder) => {
-      return folder.id === id;
-    });
-
     this.setState({ selectedFolderId: id });
   }
 
@@ -63,14 +48,15 @@ class App extends Component {
     this.setState({ folderFormValue: newValue });
   }
 
-  handleNoteSubmit(event) {
+  handleNoteSubmit(event, newNoteId) {
     // make the new note button greyed out until they add a folder
     // block action until folderList exists
     event.preventDefault();
+
     let currentDate = new Date();
 
     let newNote = {
-      id: Date.now(),
+      id: newNoteId,
       body: "New Note",
       date: currentDate.toLocaleDateString()
     }
@@ -81,6 +67,7 @@ class App extends Component {
       return folder.id === this.state.selectedFolderId;
     });
 
+    // mutability issues?
     currentFolder.noteIds.push(newNote.id);
 
     this.setState({ noteList: newNoteList });
@@ -102,7 +89,9 @@ class App extends Component {
       });
     }
 
-    return(
+    let folderChange = true;
+
+    return (
       <div className="row">
         <div className="small-4 columns">
           <FolderList
@@ -119,6 +108,7 @@ class App extends Component {
         <div className="small-8 columns">
           <NotesSection
             notes={notes}
+            folderChange={folderChange}
             handleNoteSubmit={this.handleNoteSubmit}
           />
         </div>
