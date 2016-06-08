@@ -1,0 +1,33 @@
+.folder-list {
+  border: 1px;
+  border-color: black;
+  border-style: solid;
+
+  ul { margin: 0; }
+
+  li {
+    display: block;
+    margin: 10px;
+  }
+
+  .folder {
+    padding: 5px 10px;
+    border: 1px;
+    border-color: black;
+    border-style: solid;
+  }
+}
+
+.folder-form {
+  border: 1px;
+  border-color: black;
+  border-style: solid;
+  padding: 10px;
+
+  input { margin: 0; }
+}
+
+.selected-folder {
+  background-color: blue;
+  color: white;
+}

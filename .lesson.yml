@@ -1,0 +1,8 @@
+---
+title: "React Notes Stateful"
+type: "challenge"
+description: "Render a dynamic Notes application using React stateless components"
+tags: "javascript, react, stateful components"
+ignore:
+- "node_modules/"
+- "react-notes-stateful.md"

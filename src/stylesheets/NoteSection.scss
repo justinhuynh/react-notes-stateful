@@ -1,0 +1,39 @@
+
+
+.selected-note {
+  background-color: yellow;
+  color: black;
+}
+
+.note-button {
+  margin-right: 10px;
+}
+
+.notes-list {
+  border: 1px;
+  border-color: black;
+  border-style: solid;
+
+  ul { margin: 0; }
+
+  li {
+    display: block;
+    margin: 10px;
+  }
+
+  .note {
+    border: 1px;
+    border-color: black;
+    border-style: solid;
+  }
+}
+
+.note-list-controls {
+  .columns { padding: 0px; }
+}
+
+.note-form {
+  border: 1px;
+  border-color: black;
+  border-style: solid;
+}
