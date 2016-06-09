@@ -3,14 +3,25 @@ import NoteList from './NoteList';
 import NoteForm from './NoteForm';
 import NoteListControls from './NoteListControls';
 
+
+// need some kind of listener on selectedFolderId
+// basically, whenever the selectedFolderId changes, the form content needs to update as well
+
+// keep working on handleNoteFormChange
+// basically, the value of the form is tied to state
+// the value of the form needs to depend on:
+// 1) immediately after the selectedFolderId is changed, the form should show selectedNote.body
+// 2) for all noteFormChange events afterwards, it should reflect the form updating (currentNoteValue)
+
+// the problem is with setting a "default" value that appears only once, and is able to change subsequently
+// this "default" value needs to be set every time the selectedFolderId is changed
+
 class NotesSection extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      searchFormValue: null,
-      currentNoteValue: null,
-      displayNotes: props.notes,
-      selectedNoteId: props.selectedNoteId
+      currentNoteValue: null
+      // make "selected note part of the state"
     }
 
     this.handleSearchChange = this.handleSearchChange.bind(this);
@@ -18,44 +29,30 @@ class NotesSection extends Component {
   }
 
   handleSearchChange(event) {
-    let { displayNotes, searchFormValue, selectedNoteId } = this.state;
     let newValue = event.target.value.toLowerCase();
-    let filteredNotes = displayNotes;
-
-    if (newValue) {
-      filteredNotes = displayNotes.filter((note) => {
-        return note.body.toLowerCase().includes(newValue);
-      });
-
-      selectedNoteId = filteredNotes[0] ? filteredNotes[0].id : null;
-    }
-    this.setState({
-      searchFormValue: newValue,
-      displayNotes: filteredNotes,
-      selectedNoteId: selectedNoteId
-    });
+    this.setState({ searchFormValue: newValue });
   }
 
   handleNoteFormChange(event) {
     // debugger;
     // this.props.onChange(Object.assign({}, this.props.value, {name: e.target.value}))
     let newValue = event.target.value;
+    // right
     this.setState({ currentNoteValue: newValue });
   }
 
   render() {
-    let { searchFormValue, currentNoteValue, displayNotes, selectedNoteId } = this.state;
-    let notes = this.state.displayNotes;
-    // let { notes, selectedNoteId } = this.props;
+    let { searchFormValue, currentNoteValue } = this.state;
+    let { notes, selectedNoteId } = this.props;
 
     // should this be in the handleSearchChange method?
-    // if (searchFormValue) {
-    //   notes = notes.filter((note) => {
-    //     return note.body.toLowerCase().includes(searchFormValue);
-    //   });
-    //
-    //   selectedNoteId = notes[0] ? notes[0].id : null
-    // }
+    if (searchFormValue) {
+      notes = notes.filter((note) => {
+        return note.body.toLowerCase().includes(searchFormValue);
+      });
+
+      selectedNoteId = notes[0] ? notes[0].id : null
+    }
 
     let selectedNote = notes.find(note => {
       return note.id === selectedNoteId;
