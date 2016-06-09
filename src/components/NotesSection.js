@@ -6,56 +6,62 @@ import NoteListControls from './NoteListControls';
 class NotesSection extends Component {
   constructor(props) {
     super(props);
-    let selectedNoteId = null;
+    this.state = {
+      searchFormValue: null,
+      currentNoteValue: null,
+      displayNotes: props.notes,
+      selectedNoteId: props.selectedNoteId
+    }
 
-    if (props.notes[0]) { selectedNoteId = props.notes[0].id }
-
-    this.state = { selectedNoteId }
-
-    this.handleNoteClick = this.handleNoteClick.bind(this);
     this.handleSearchChange = this.handleSearchChange.bind(this);
-    this.handleNoteSubmission = this.handleNoteSubmission.bind(this);
-  }
-
-  handleNoteSubmission(event) {
-    let newNoteId = Date.now();
-    this.props.handleNoteSubmit(event, newNoteId);
-    this.setState({ selectedNoteId: newNoteId })
-  }
-
-  handleNoteClick(id) {
-    this.setState({ selectedNoteId: id });
+    this.handleNoteFormChange = this.handleNoteFormChange.bind(this);
   }
 
   handleSearchChange(event) {
+    let { displayNotes, searchFormValue, selectedNoteId } = this.state;
     let newValue = event.target.value.toLowerCase();
-    this.setState({ searchFormValue: newValue });
+    let filteredNotes = displayNotes;
+
+    if (newValue) {
+      filteredNotes = displayNotes.filter((note) => {
+        return note.body.toLowerCase().includes(newValue);
+      });
+
+      selectedNoteId = filteredNotes[0] ? filteredNotes[0].id : null;
+    }
+    this.setState({
+      searchFormValue: newValue,
+      displayNotes: filteredNotes,
+      selectedNoteId: selectedNoteId
+    });
   }
 
-  updateFolderState() {
-    if (this.props.notes[0]) {
-      this.setState({
-        selectedNoteId: notes[0].id,
-        folderChange: false
-      })
-    }
+  handleNoteFormChange(event) {
+    // debugger;
+    // this.props.onChange(Object.assign({}, this.props.value, {name: e.target.value}))
+    let newValue = event.target.value;
+    this.setState({ currentNoteValue: newValue });
   }
 
   render() {
-    let { searchFormValue, selectedNoteId } = this.state;
-    let { notes } = this.props;
+    let { searchFormValue, currentNoteValue, displayNotes, selectedNoteId } = this.state;
+    let notes = this.state.displayNotes;
+    // let { notes, selectedNoteId } = this.props;
 
-    if (searchFormValue) {
-      notes = notes.filter((note) => {
-        return note.body.toLowerCase().includes(searchFormValue);
-      });
-    }
+    // should this be in the handleSearchChange method?
+    // if (searchFormValue) {
+    //   notes = notes.filter((note) => {
+    //     return note.body.toLowerCase().includes(searchFormValue);
+    //   });
+    //
+    //   selectedNoteId = notes[0] ? notes[0].id : null
+    // }
 
-    // props
-    if (this.state.folderChange && notes[0]) {
-      updateFolderState();
-    }
-    // let noteIds = notes.map(note => { return note.id });
+    let selectedNote = notes.find(note => {
+      return note.id === selectedNoteId;
+    });
+
+    if (selectedNote) { currentNoteValue = currentNoteValue || selectedNote.body; }
 
     return (
       <div className="row notes-section">
@@ -63,16 +69,22 @@ class NotesSection extends Component {
           <NoteListControls
             searchFormValue={this.state.searchFormValue}
             handleSearchChange={this.handleSearchChange}
-            handleNoteSubmit={this.handleNoteSubmission}
+            handleNoteSubmit={this.props.handleNoteSubmit}
           />
           <NoteList
             notes={notes}
-            handleNoteClick={this.handleNoteClick}
+            handleNoteClick={this.props.handleNoteClick}
             selectedNoteId={selectedNoteId}
           />
         </div>
         <div className="small-6 columns">
-          <NoteForm />
+          <NoteForm
+            handleNoteUpdate={this.props.handleNoteUpdate}
+            handleNoteDelete={this.props.handleNoteDelete}
+            selectedNote={selectedNote}
+            currentNoteValue={currentNoteValue}
+            handleNoteFormChange={this.handleNoteFormChange}
+          />
         </div>
       </div>
     )

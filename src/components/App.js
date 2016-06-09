@@ -4,9 +4,6 @@ import FolderForm from './FolderForm';
 import NotesSection from './NotesSection';
 import InitialState from '../constants/InitialState';
 
-// d = new Date();
-// current_date_formatted = d.toLocaleDateString();
-
 class App extends Component {
   constructor(props) {
     super(props);
@@ -20,6 +17,9 @@ class App extends Component {
     this.handleFolderClick = this.handleFolderClick.bind(this);
     this.handleFolderFormChange = this.handleFolderFormChange.bind(this);
     this.handleNoteSubmit = this.handleNoteSubmit.bind(this);
+    this.handleNoteClick = this.handleNoteClick.bind(this);
+    this.handleNoteUpdate = this.handleNoteUpdate.bind(this);
+    this.handleNoteDelete = this.handleNoteDelete.bind(this);
   }
 
   handleFolderSubmit(event) {
@@ -40,7 +40,20 @@ class App extends Component {
   }
 
   handleFolderClick(id) {
-    this.setState({ selectedFolderId: id });
+    let currentFolder = this.state.folderList.find(folder => {
+      return folder.id === id;
+    });
+
+    let selectedNoteId = null;
+
+    if (currentFolder.noteIds.length) {
+      selectedNoteId = currentFolder.noteIds[0];
+    }
+
+    this.setState({
+      selectedFolderId: id,
+      selectedNoteId: selectedNoteId
+    });
   }
 
   handleFolderFormChange(event) {
@@ -48,7 +61,19 @@ class App extends Component {
     this.setState({ folderFormValue: newValue });
   }
 
-  handleNoteSubmit(event, newNoteId) {
+  handleNoteClick(id) {
+    this.setState({ selectedNoteId: id });
+  }
+
+  handleNoteUpdate(id, content) {
+    debugger;
+  }
+
+  handleNoteDelete(id) {
+    debugger;
+  }
+
+  handleNoteSubmit(event) {
     // make the new note button greyed out until they add a folder
     // block action until folderList exists
     event.preventDefault();
@@ -56,7 +81,7 @@ class App extends Component {
     let currentDate = new Date();
 
     let newNote = {
-      id: newNoteId,
+      id: Date.now(),
       body: "New Note",
       date: currentDate.toLocaleDateString()
     }
@@ -70,7 +95,10 @@ class App extends Component {
     // mutability issues?
     currentFolder.noteIds.push(newNote.id);
 
-    this.setState({ noteList: newNoteList });
+    this.setState({
+      noteList: newNoteList,
+      selectedNoteId: newNote.id
+   });
   }
 
   render() {
@@ -89,8 +117,6 @@ class App extends Component {
       });
     }
 
-    let folderChange = true;
-
     return (
       <div className="row">
         <div className="small-4 columns">
@@ -108,8 +134,11 @@ class App extends Component {
         <div className="small-8 columns">
           <NotesSection
             notes={notes}
-            folderChange={folderChange}
+            selectedNoteId={this.state.selectedNoteId}
+            handleNoteClick={this.handleNoteClick}
             handleNoteSubmit={this.handleNoteSubmit}
+            handleNoteUpdate={this.handleNoteUpdate}
+            handleNoteDelete={this.handleNoteDelete}
           />
         </div>
       </div>
