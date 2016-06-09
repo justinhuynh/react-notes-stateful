@@ -3,7 +3,6 @@ import NoteList from './NoteList';
 import NoteForm from './NoteForm';
 import NoteListControls from './NoteListControls';
 
-
 // need some kind of listener on selectedFolderId
 // basically, whenever the selectedFolderId changes, the form content needs to update as well
 
@@ -21,16 +20,9 @@ class NotesSection extends Component {
     super(props);
     this.state = {
       currentNoteValue: null
-      // make "selected note part of the state"
     }
 
-    this.handleSearchChange = this.handleSearchChange.bind(this);
     this.handleNoteFormChange = this.handleNoteFormChange.bind(this);
-  }
-
-  handleSearchChange(event) {
-    let newValue = event.target.value.toLowerCase();
-    this.setState({ searchFormValue: newValue });
   }
 
   handleNoteFormChange(event) {
@@ -42,8 +34,7 @@ class NotesSection extends Component {
   }
 
   render() {
-    let { searchFormValue, currentNoteValue } = this.state;
-    let { notes, selectedNoteId } = this.props;
+    let { searchFormValue, currentNoteValue, notes, selectedNoteId } = this.props;
 
     // should this be in the handleSearchChange method?
     if (searchFormValue) {
@@ -58,7 +49,9 @@ class NotesSection extends Component {
       return note.id === selectedNoteId;
     });
 
-    if (selectedNote) { currentNoteValue = currentNoteValue || selectedNote.body; }
+    if (selectedNote) {
+      currentNoteValue = currentNoteValue || selectedNote.body;
+    }
 
     return (
       <div className="row notes-section">

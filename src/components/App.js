@@ -10,7 +10,8 @@ class App extends Component {
     this.state = {
       folderList: [],
       noteList: [],
-      selectedFolder: null
+      selectedFolderId: null,
+      displayNotes: []
     };
 
     this.handleFolderSubmit = this.handleFolderSubmit.bind(this);
@@ -20,6 +21,7 @@ class App extends Component {
     this.handleNoteClick = this.handleNoteClick.bind(this);
     this.handleNoteUpdate = this.handleNoteUpdate.bind(this);
     this.handleNoteDelete = this.handleNoteDelete.bind(this);
+    this.handleSearchChange = this.handleSearchChange.bind(this);
   }
 
   handleFolderSubmit(event) {
@@ -40,19 +42,29 @@ class App extends Component {
   }
 
   handleFolderClick(id) {
-    let currentFolder = this.state.folderList.find(folder => {
+    let { folderList, noteList } = this.state;
+
+    let selectedFolder = folderList.find(folder => {
       return folder.id === id;
     });
 
+    let displayNotes = [];
     let selectedNoteId = null;
 
-    if (currentFolder.noteIds.length) {
-      selectedNoteId = currentFolder.noteIds[0];
+    if (selectedFolder.noteIds[0]) {
+       displayNotes = selectedFolder.noteIds.map(noteId => {
+        return noteList.find(note => {
+          return note.id === noteId;
+        });
+      });
+
+      selectedNoteId = selectedFolder.noteIds[0];
     }
 
     this.setState({
       selectedFolderId: id,
-      selectedNoteId: selectedNoteId
+      selectedNoteId: selectedNoteId,
+      displayNotes: displayNotes
     });
   }
 
@@ -95,28 +107,23 @@ class App extends Component {
     // mutability issues?
     currentFolder.noteIds.push(newNote.id);
 
+
+    // update display notes
     this.setState({
       noteList: newNoteList,
       selectedNoteId: newNote.id
-   });
+    });
+  }
+
+  handleSearchChange(event) {
+    let newValue = event.target.value.toLowerCase();
+    this.setState({
+      searchFormValue: newValue
+    });
   }
 
   render() {
-    let { folderList, selectedFolderId, noteList } = this.state;
-    let notes = noteList;
-
-    if (selectedFolderId) {
-      let selectedFolder = folderList.find(folder => {
-        return folder.id === selectedFolderId;
-      });
-
-      notes = selectedFolder.noteIds.map(noteId => {
-        return noteList.find(note => {
-          return note.id === noteId;
-        });
-      });
-    }
-
+    let { folderList, displayNotes, folderFormValue, selectedNoteId, selectedFolderId } = this.state;
     return (
       <div className="row">
         <div className="small-4 columns">
@@ -126,19 +133,20 @@ class App extends Component {
             handleFolderClick={this.handleFolderClick}
           />
           <FolderForm
-            folderFormValue={this.state.folderFormValue}
+            folderFormValue={folderFormValue}
             handleChange={this.handleFolderFormChange}
             handleSubmit={this.handleFolderSubmit}
           />
         </div>
         <div className="small-8 columns">
           <NotesSection
-            notes={notes}
-            selectedNoteId={this.state.selectedNoteId}
+            notes={displayNotes}
+            selectedNoteId={selectedNoteId}
             handleNoteClick={this.handleNoteClick}
             handleNoteSubmit={this.handleNoteSubmit}
             handleNoteUpdate={this.handleNoteUpdate}
             handleNoteDelete={this.handleNoteDelete}
+            handleSearchChange={this.handleSearchChange}
           />
         </div>
       </div>
