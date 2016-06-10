@@ -25,7 +25,6 @@ class NotesSection extends Component {
     }
 
     this.handleSearchChange = this.handleSearchChange.bind(this);
-    this.handleNoteFormChange = this.handleNoteFormChange.bind(this);
   }
 
   handleSearchChange(event) {
@@ -33,17 +32,10 @@ class NotesSection extends Component {
     this.setState({ searchFormValue: newValue });
   }
 
-  handleNoteFormChange(event) {
-    // debugger;
-    // this.props.onChange(Object.assign({}, this.props.value, {name: e.target.value}))
-    let newValue = event.target.value;
-    // right
-    this.setState({ currentNoteValue: newValue });
-  }
-
   render() {
-    let { searchFormValue, currentNoteValue } = this.state;
-    let { notes, selectedNoteId } = this.props;
+    let { searchFormValue } = this.state;
+    let { notes, selectedNoteId, handleNoteFormChange, handleNoteUpdate, handleNoteDelete, currentNoteValue } = this.props;
+    let noteForm;
 
     // should this be in the handleSearchChange method?
     if (searchFormValue) {
@@ -58,7 +50,18 @@ class NotesSection extends Component {
       return note.id === selectedNoteId;
     });
 
-    if (selectedNote) { currentNoteValue = currentNoteValue || selectedNote.body; }
+    if (selectedNote) {
+      currentNoteValue = currentNoteValue || selectedNote.body;
+      noteForm = <NoteForm
+                  handleNoteUpdate={handleNoteUpdate}
+                  handleNoteDelete={handleNoteDelete}
+                  selectedNote={selectedNote}
+                  currentNoteValue={currentNoteValue}
+                  handleNoteFormChange={handleNoteFormChange}
+                />
+    } else {
+      noteForm = null;
+    }
 
     return (
       <div className="row notes-section">
@@ -75,13 +78,7 @@ class NotesSection extends Component {
           />
         </div>
         <div className="small-6 columns">
-          <NoteForm
-            handleNoteUpdate={this.props.handleNoteUpdate}
-            handleNoteDelete={this.props.handleNoteDelete}
-            selectedNote={selectedNote}
-            currentNoteValue={currentNoteValue}
-            handleNoteFormChange={this.handleNoteFormChange}
-          />
+          {noteForm}
         </div>
       </div>
     )

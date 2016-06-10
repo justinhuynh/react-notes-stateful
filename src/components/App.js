@@ -10,7 +10,8 @@ class App extends Component {
     this.state = {
       folderList: [],
       noteList: [],
-      selectedFolder: null
+      selectedFolder: null,
+      currentNoteValue: null
     };
 
     this.handleFolderSubmit = this.handleFolderSubmit.bind(this);
@@ -20,6 +21,7 @@ class App extends Component {
     this.handleNoteClick = this.handleNoteClick.bind(this);
     this.handleNoteUpdate = this.handleNoteUpdate.bind(this);
     this.handleNoteDelete = this.handleNoteDelete.bind(this);
+    this.handleNoteFormChange = this.handleNoteFormChange.bind(this);
   }
 
   handleFolderSubmit(event) {
@@ -65,17 +67,50 @@ class App extends Component {
     this.setState({ selectedNoteId: id });
   }
 
-  handleNoteUpdate(id, content) {
-    debugger;
+  handleNoteUpdate(id) {
+    let noteToUpdate = this.state.noteList.find((note) => {
+      return note.id === id;
+    });
+
+    let currentDate = new Date();
+
+    let updatedNote = {
+      body: this.state.currentNoteValue,
+      date: currentDate.toLocaleDateString()
+    }
+
+    Object.assign(noteToUpdate, updatedNote);
+    this.setState({currentNoteValue: null})
   }
 
   handleNoteDelete(id) {
-    debugger;
+    let { noteList, folderList, selectedFolderId } = this.state;
+
+    let newNoteList = noteList.filter(note => {
+      return note.id !== id;
+    });
+
+    let selectedFolder = folderList.find(folder => {
+      return folder.id === selectedFolderId;
+    });
+
+    let newFolderNoteIds = selectedFolder.noteIds.filter(noteId => {
+      return noteId !== id;
+    })
+
+    selectedFolder.noteIds = newFolderNoteIds;
+
+    this.setState({
+      noteList: newNoteList
+    });
+  }
+
+  handleNoteFormChange(event) {
+    let newValue = event.target.value;
+    this.setState({ currentNoteValue: newValue });
   }
 
   handleNoteSubmit(event) {
-    // make the new note button greyed out until they add a folder
-    // block action until folderList exists
     event.preventDefault();
 
     let currentDate = new Date();
@@ -139,6 +174,8 @@ class App extends Component {
             handleNoteSubmit={this.handleNoteSubmit}
             handleNoteUpdate={this.handleNoteUpdate}
             handleNoteDelete={this.handleNoteDelete}
+            handleNoteFormChange={this.handleNoteFormChange}
+            currentNoteValue={this.state.currentNoteValue}
           />
         </div>
       </div>
