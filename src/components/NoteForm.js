@@ -28,6 +28,7 @@ const NoteForm = props => {
           <textarea
             name="note_text"
             onChange={props.handleNoteFormChange}
+            defaultValue={selectedNoteValue}
             value={currentNoteValue}
           >
           </textarea>
