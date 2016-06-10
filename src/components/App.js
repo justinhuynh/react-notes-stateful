@@ -4,22 +4,24 @@ import FolderForm from './FolderForm';
 import NotesSection from './NotesSection';
 import InitialState from '../constants/InitialState';
 
-// d = new Date();
-// current_date_formatted = d.toLocaleDateString();
-
 class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
       folderList: [],
       noteList: [],
-      selectedFolder: null
+      selectedFolder: null,
+      currentNoteValue: null
     };
 
     this.handleFolderSubmit = this.handleFolderSubmit.bind(this);
     this.handleFolderClick = this.handleFolderClick.bind(this);
     this.handleFolderFormChange = this.handleFolderFormChange.bind(this);
     this.handleNoteSubmit = this.handleNoteSubmit.bind(this);
+    this.handleNoteClick = this.handleNoteClick.bind(this);
+    this.handleNoteUpdate = this.handleNoteUpdate.bind(this);
+    this.handleNoteDelete = this.handleNoteDelete.bind(this);
+    this.handleNoteFormChange = this.handleNoteFormChange.bind(this);
   }
 
   handleFolderSubmit(event) {
@@ -40,7 +42,20 @@ class App extends Component {
   }
 
   handleFolderClick(id) {
-    this.setState({ selectedFolderId: id });
+    let currentFolder = this.state.folderList.find(folder => {
+      return folder.id === id;
+    });
+
+    let selectedNoteId = null;
+
+    if (currentFolder.noteIds.length) {
+      selectedNoteId = currentFolder.noteIds[0];
+    }
+
+    this.setState({
+      selectedFolderId: id,
+      selectedNoteId: selectedNoteId
+    });
   }
 
   handleFolderFormChange(event) {
@@ -48,15 +63,60 @@ class App extends Component {
     this.setState({ folderFormValue: newValue });
   }
 
-  handleNoteSubmit(event, newNoteId) {
-    // make the new note button greyed out until they add a folder
-    // block action until folderList exists
+  handleNoteClick(id) {
+    this.setState({ selectedNoteId: id });
+  }
+
+  handleNoteUpdate(id) {
+    let noteToUpdate = this.state.noteList.find((note) => {
+      return note.id === id;
+    });
+
+    let currentDate = new Date();
+
+    let updatedNote = {
+      body: this.state.currentNoteValue,
+      date: currentDate.toLocaleDateString()
+    }
+
+    Object.assign(noteToUpdate, updatedNote);
+    this.setState({currentNoteValue: null})
+  }
+
+  handleNoteDelete(id) {
+    let { noteList, folderList, selectedFolderId } = this.state;
+
+    let newNoteList = noteList.filter(note => {
+      return note.id !== id;
+    });
+
+    let selectedFolder = folderList.find(folder => {
+      return folder.id === selectedFolderId;
+    });
+
+    let newFolderNoteIds = selectedFolder.noteIds.filter(noteId => {
+      return noteId !== id;
+    })
+
+    selectedFolder.noteIds = newFolderNoteIds;
+
+    this.setState({
+      noteList: newNoteList
+    });
+  }
+
+  handleNoteFormChange(event) {
+    let newValue = event.target.value;
+    this.setState({ currentNoteValue: newValue });
+  }
+
+  handleNoteSubmit(event) {
     event.preventDefault();
 
     let currentDate = new Date();
 
     let newNote = {
-      id: newNoteId,
+      id: Date.now(),
       body: "New Note",
       date: currentDate.toLocaleDateString()
     }
@@ -70,7 +130,10 @@ class App extends Component {
     // mutability issues?
     currentFolder.noteIds.push(newNote.id);
 
-    this.setState({ noteList: newNoteList });
+    this.setState({
+      noteList: newNoteList,
+      selectedNoteId: newNote.id
+   });
   }
 
   render() {
@@ -89,8 +152,6 @@ class App extends Component {
       });
     }
 
-    let folderChange = true;
-
     return (
       <div className="row">
         <div className="small-4 columns">
@@ -108,8 +169,13 @@ class App extends Component {
         <div className="small-8 columns">
           <NotesSection
             notes={notes}
-            folderChange={folderChange}
+            selectedNoteId={this.state.selectedNoteId}
+            handleNoteClick={this.handleNoteClick}
             handleNoteSubmit={this.handleNoteSubmit}
+            handleNoteUpdate={this.handleNoteUpdate}
+            handleNoteDelete={this.handleNoteDelete}
+            handleNoteFormChange={this.handleNoteFormChange}
+            currentNoteValue={this.state.currentNoteValue}
           />
         </div>
       </div>
