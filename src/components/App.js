@@ -10,9 +10,33 @@ class App extends Component {
     this.state = {
       folderList: [],
       noteList: [],
-      selectedFolder: null,
+      selectedFolderId: null,
       currentNoteValue: null
     };
+
+    // this.state = {
+    //   folders = {
+    //     1: {
+    //       ..folderinformation
+    //       notesById: [2]
+    //     }
+    //   },
+    //   folderListByIds: [1],
+    //   notes = {
+    //     2: {
+    //       ..noteInformation
+    //     }
+    //   },
+    //   selectedFolderId: null,
+    //   selectedNoteId: null
+    // // };
+    //
+    // let newFolders = Object.assign({} , this.state.folders, {
+    //   newFolderId: {
+    //     notesById: []
+    //   }
+    // });
+    // this.setState: { folders: newFolders }
 
     this.handleFolderSubmit = this.handleFolderSubmit.bind(this);
     this.handleFolderClick = this.handleFolderClick.bind(this);
